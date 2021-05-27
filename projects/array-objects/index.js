@@ -11,7 +11,7 @@
  */
 function forEach(array, fn) {
   for (let i = 0; i < array.length; i++) {
-    fn(array[i]);
+    fn(array[i], i, array);
   }
 }
 
@@ -27,7 +27,7 @@ function forEach(array, fn) {
 function map(array, fn) {
   const newArray = [];
   for (let i = 0; i < array.length; i++) {
-    newArray.push(fn(array[i]));
+    newArray.push(fn(array[i], i, array));
   }
   return newArray;
 }
@@ -44,7 +44,7 @@ function map(array, fn) {
 function reduce(array, fn, initial) {
   let result = 0;
   for (let i = 0; i < array.length; i++) {
-    result = fn(array[i], result, initial);
+    result = fn(result, array[i], i);
   }
   return result;
 }
@@ -58,8 +58,8 @@ function reduce(array, fn, initial) {
    upperProps({ name: 'Сергей', lastName: 'Петров' }) вернет ['NAME', 'LASTNAME']
  */
 function upperProps(obj) {
-  return Object.keys(obj).map((arr) => {
-    return arr.toUpperCase();
+  return Object.keys(obj).map((str) => {
+    return str.toUpperCase();
   });
 }
 
