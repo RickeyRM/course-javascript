@@ -99,7 +99,7 @@ function findError(where) {
  */
 function deleteTextNodes(where) {
   for (const el of where.childNodes) {
-    if (el.nodeType === '3') {
+    if (el.nodeType === 3) {
       el.remove();
     }
 
@@ -124,10 +124,10 @@ function deleteTextNodesRecursive(where) {
   // console.log(num)
   // console.log(p[num].nodeType)
   while (num < p.length) {
-    if (p[num].nodeType === '3') {
+    if (p[num].nodeType === 3) {
       where.removeChild(p[num]);
       num--;
-    } else if (p[num].nodeType === '1') {
+    } else if (p[num].nodeType === 1) {
       deleteTextNodesRecursive(p[num]);
     }
     num++;
