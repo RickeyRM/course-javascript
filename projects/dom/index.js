@@ -50,11 +50,13 @@ function prepend(what, where) {
  */
 function findAllPSiblings(where) {
   const result = [];
+
   for (const el of where.children) {
     if (el.nodeName === 'P') {
       result.push(el.previousElementSibling);
     }
   }
+
   return result;
 }
 
@@ -99,11 +101,9 @@ function findError(where) {
  */
 function deleteTextNodes(where) {
   for (const el of where.childNodes) {
-    if (el.nodeType === 3) {
+    if (el.nodeType === Element.TEXT_NODE) {
       el.remove();
     }
-
-    console.log(el);
   }
 }
 
@@ -121,8 +121,7 @@ function deleteTextNodes(where) {
 function deleteTextNodesRecursive(where) {
   const p = where.childNodes;
   let num = 0;
-  // console.log(num)
-  // console.log(p[num].nodeType)
+
   while (num < p.length) {
     if (p[num].nodeType === 3) {
       where.removeChild(p[num]);
@@ -130,21 +129,9 @@ function deleteTextNodesRecursive(where) {
     } else if (p[num].nodeType === 1) {
       deleteTextNodesRecursive(p[num]);
     }
+
     num++;
   }
-
-  // let p = where.childNodes
-  // let num = 0;
-  // // console.log(p[num].nodeName)
-  // // console.log(num)
-  // while(num < p.length){
-  //     if(p[num].nodeName == '#text'){
-  //         console.log(p[num])
-  //         p[num].remove();
-  //     }
-  //     num++
-  // }
-  // console.log(p)
 }
 
 /*
