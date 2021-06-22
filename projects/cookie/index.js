@@ -45,8 +45,118 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
+const cookiesMap = getCookies();
+
+updateTable();
+
+function getCookies() {
+  return document.cookie
+    .split('; ')
+    .filter(Boolean)
+    .map((cookie) => cookie.match(/^([^=]+)=(.+)/))
+    .reduce((obj, [, name, value]) => {
+      obj.set(name, value);
+
+      return obj;
+    }, new Map());
+}
+console.log(cookiesMap);
+
 filterNameInput.addEventListener('input', function () {});
 
-addButton.addEventListener('click', () => {});
+addButton.addEventListener('click', () => {
+  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
 
-listTable.addEventListener('click', (e) => {});
+  addNameInput.value = '';
+  addValueInput.value = '';
+
+  updateTable();
+});
+
+listTable.addEventListener('click', (e) => {
+  const { role, cookieName } = e.target.dataset;
+  console.log(role, cookieName);
+  console.log(e.target.dataset);
+  if (e.target.tagName === 'BUTTON') {
+    updateTable();
+  }
+});
+
+function updateTable() {
+  const fragment = document.createDocumentFragment();
+
+  listTable.innerHTML = '';
+
+  for (const [name, value] of cookiesMap) {
+    console.log(name, value);
+
+    const tr = document.createElement('tr');
+    const nameTD = document.createElement('td');
+    const valueTD = document.createElement('td');
+    const removeTD = document.createElement('td');
+    const removeButton = document.createElement('button');
+
+    nameTD.textContent = name;
+    valueTD.textContent = value;
+    valueTD.classList.add('value');
+    removeButton.textContent = 'Удалить';
+    removeTD.append(removeButton);
+
+    tr.append(nameTD, valueTD, removeTD);
+    fragment.append(tr);
+  }
+
+  listTable.append(fragment);
+}
+
+// const cookiesMap = getCookies();
+
+// function getCookies (){
+//   return document.cookie
+//     .split('; ')
+//     .filter(Boolean)
+//     .map((cookie) => cookie.match(/^([^=]+)=(.+)/))
+//     // .reduce((prev, current) =>{
+//     // const [name, value] = current.split("=");
+//     // prev[name] = value;
+//     // return prev;
+//     .reduce((obj, [, name, value]) =>{
+//       obj.set(name, value);
+//       return obj;
+//     }, new Map());
+
+// }
+
+// filterNameInput.addEventListener('input', function () {
+
+// });
+
+// addButton.addEventListener('click', () => {
+//   document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+
+//   addNameInput.value = '';
+//   addValueInput.value = '';
+
+//   updateTable();
+// });
+
+// listTable.addEventListener('click', (e) => {
+
+// });
+
+// function updateTable () {
+
+//     const tr = document.createElement('tr');
+//     const nameTD = document.createElement('td');
+//     const valueTD = document.createElement('td');
+//     const removeTD = document.createElement('td');
+//     const removeButton = document.createElement('button');
+//     // valueTD.classList.add('value');
+//     // listTable.append(nameTD, valueTD, removeTD);
+//     // valueTD.classList.add('value');
+//     // tr.append(nameTD, valueTD, removeTD);
+//     // listTable.append(tr);
+//     // nameTD.textContent = addNameInput.value;
+//     // valueTD.textContent = addValueInput.value;
+
+// }
