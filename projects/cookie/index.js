@@ -44,7 +44,6 @@ const addValueInput = homeworkContainer.querySelector('#add-value-input');
 const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
-
 const cookiesMap = getCookies();
 
 updateTable();
@@ -53,14 +52,15 @@ function getCookies() {
   return document.cookie
     .split('; ')
     .filter(Boolean)
-    .map((cookie) => cookie.match(/^([^=]+)=(.+)/))
+    .map((cookie) => {
+      return cookie.match(/^([^=]+)=(.+)/);
+    })
     .reduce((obj, [, name, value]) => {
       obj.set(name, value);
 
       return obj;
     }, new Map());
 }
-console.log(cookiesMap);
 
 filterNameInput.addEventListener('input', function () {});
 
@@ -75,21 +75,20 @@ addButton.addEventListener('click', () => {
 
 listTable.addEventListener('click', (e) => {
   const { role, cookieName } = e.target.dataset;
-  console.log(role, cookieName);
-  console.log(e.target.dataset);
-  if (e.target.tagName === 'BUTTON') {
+  if (role === 'remove-cookie') {
+    cookiesMap.delete(cookieName);
+    document.cookie = `${cookieName}=deleted; max-age=0`;
     updateTable();
   }
 });
 
 function updateTable() {
+  const cookiesMap = getCookies();
   const fragment = document.createDocumentFragment();
 
   listTable.innerHTML = '';
 
   for (const [name, value] of cookiesMap) {
-    console.log(name, value);
-
     const tr = document.createElement('tr');
     const nameTD = document.createElement('td');
     const valueTD = document.createElement('td');
@@ -99,6 +98,8 @@ function updateTable() {
     nameTD.textContent = name;
     valueTD.textContent = value;
     valueTD.classList.add('value');
+    removeButton.dataset.role = 'remove-cookie';
+    removeButton.dataset.cookieName = name;
     removeButton.textContent = 'Удалить';
     removeTD.append(removeButton);
 
@@ -108,55 +109,3 @@ function updateTable() {
 
   listTable.append(fragment);
 }
-
-// const cookiesMap = getCookies();
-
-// function getCookies (){
-//   return document.cookie
-//     .split('; ')
-//     .filter(Boolean)
-//     .map((cookie) => cookie.match(/^([^=]+)=(.+)/))
-//     // .reduce((prev, current) =>{
-//     // const [name, value] = current.split("=");
-//     // prev[name] = value;
-//     // return prev;
-//     .reduce((obj, [, name, value]) =>{
-//       obj.set(name, value);
-//       return obj;
-//     }, new Map());
-
-// }
-
-// filterNameInput.addEventListener('input', function () {
-
-// });
-
-// addButton.addEventListener('click', () => {
-//   document.cookie = `${addNameInput.value}=${addValueInput.value}`;
-
-//   addNameInput.value = '';
-//   addValueInput.value = '';
-
-//   updateTable();
-// });
-
-// listTable.addEventListener('click', (e) => {
-
-// });
-
-// function updateTable () {
-
-//     const tr = document.createElement('tr');
-//     const nameTD = document.createElement('td');
-//     const valueTD = document.createElement('td');
-//     const removeTD = document.createElement('td');
-//     const removeButton = document.createElement('button');
-//     // valueTD.classList.add('value');
-//     // listTable.append(nameTD, valueTD, removeTD);
-//     // valueTD.classList.add('value');
-//     // tr.append(nameTD, valueTD, removeTD);
-//     // listTable.append(tr);
-//     // nameTD.textContent = addNameInput.value;
-//     // valueTD.textContent = addValueInput.value;
-
-// }
