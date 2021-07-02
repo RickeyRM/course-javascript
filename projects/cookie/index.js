@@ -1,38 +1,5 @@
-/*
- ДЗ 7 - Создать редактор cookie с возможностью фильтрации
-
- 7.1: На странице должна быть таблица со списком имеющихся cookie. Таблица должна иметь следующие столбцы:
-   - имя
-   - значение
-   - удалить (при нажатии на кнопку, выбранная cookie удаляется из браузера и таблицы)
-
- 7.2: На странице должна быть форма для добавления новой cookie. Форма должна содержать следующие поля:
-   - имя
-   - значение
-   - добавить (при нажатии на кнопку, в браузер и таблицу добавляется новая cookie с указанным именем и значением)
-
- Если добавляется cookie с именем уже существующей cookie, то ее значение в браузере и таблице должно быть обновлено
-
- 7.3: На странице должно быть текстовое поле для фильтрации cookie
- В таблице должны быть только те cookie, в имени или значении которых, хотя бы частично, есть введенное значение
- Если в поле фильтра пусто, то должны выводиться все доступные cookie
- Если добавляемая cookie не соответствует фильтру, то она должна быть добавлена только в браузер, но не в таблицу
- Если добавляется cookie, с именем уже существующей cookie и ее новое значение не соответствует фильтру,
- то ее значение должно быть обновлено в браузере, а из таблицы cookie должна быть удалена
-
- Запрещено использовать сторонние библиотеки. Разрешено пользоваться только тем, что встроено в браузер
- */
-
 import './cookie.html';
 
-/*
- app - это контейнер для всех ваших домашних заданий
- Если вы создаете новые html-элементы и добавляете их на страницу, то добавляйте их только в этот контейнер
-
- Пример:
-   const newDiv = document.createElement('div');
-   homeworkContainer.appendChild(newDiv);
- */
 const homeworkContainer = document.querySelector('#app');
 // текстовое поле для фильтрации cookie
 const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
@@ -44,9 +11,8 @@ const addValueInput = homeworkContainer.querySelector('#add-value-input');
 const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
-const cookiesMap = getCookies();
 
-updateTable();
+const cookiesMap = getCookies();
 
 function getCookies() {
   return document.cookie
@@ -62,50 +28,66 @@ function getCookies() {
     }, new Map());
 }
 
-filterNameInput.addEventListener('input', function () {});
-
-addButton.addEventListener('click', () => {
-  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
-
-  addNameInput.value = '';
-  addValueInput.value = '';
-
-  updateTable();
-});
-
-listTable.addEventListener('click', (e) => {
-  const { role, cookieName } = e.target.dataset;
-  if (role === 'remove-cookie') {
-    cookiesMap.delete(cookieName);
-    document.cookie = `${cookieName}=deleted; max-age=0`;
-    updateTable();
-  }
-});
-
-function updateTable() {
-  const cookiesMap = getCookies();
+const updateTable = (payload) => {
   const fragment = document.createDocumentFragment();
 
-  listTable.innerHTML = '';
-
-  for (const [name, value] of cookiesMap) {
+  payload.forEach((value, key) => {
     const tr = document.createElement('tr');
     const nameTD = document.createElement('td');
     const valueTD = document.createElement('td');
     const removeTD = document.createElement('td');
-    const removeButton = document.createElement('button');
+    const removeBtn = document.createElement('button');
 
-    nameTD.textContent = name;
+    nameTD.textContent = key;
     valueTD.textContent = value;
     valueTD.classList.add('value');
-    removeButton.dataset.role = 'remove-cookie';
-    removeButton.dataset.cookieName = name;
-    removeButton.textContent = 'Удалить';
-    removeTD.append(removeButton);
+    removeBtn.textContent = 'Delete';
+    removeBtn.dataset.role = 'remove-cookie';
 
+    removeTD.append(removeBtn);
     tr.append(nameTD, valueTD, removeTD);
     fragment.append(tr);
-  }
+  });
 
+  listTable.innerHTML = '';
   listTable.append(fragment);
+};
+
+updateTable(cookiesMap);
+
+const addCookie = () => {
+  document.cookie = `${addNameInput.value.trim()}=${addValueInput.value.trim()}`;
+
+  addNameInput.value = '';
+  addValueInput.value = '';
+};
+
+addButton.addEventListener('click', () => {
+  addCookie();
+  updateTable(getCookies());
+});
+
+const removeCookie = (e) => {
+  const currentRow = e.target.closest('tr');
+  const nameTd = currentRow.querySelector('td');
+
+  document.cookie = `${nameTd.textContent}=;max-age=0`;
+};
+
+listTable.addEventListener('click', (e) => {
+  const { target } = e;
+  if (target.dataset.role && target.dataset.role === 'remove-cookie') {
+    removeCookie(e);
+    updateTable(getCookies());
+  }
+});
+
+function getFilterCookie(e) {
+  const cookies = getCookies();
+  const { value } = e.target;
+  return new Map([...cookies].filter(([key]) => key.includes(value)));
 }
+
+filterNameInput.addEventListener('input', (e) => {
+  updateTable(getFilterCookie(e));
+});
